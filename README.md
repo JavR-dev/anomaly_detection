@@ -11,8 +11,8 @@
 
 
 # Challenge Summary
-To solve the problem, the
-Social network construction: 
+
+###Social network construction: 
 A social network is a simple undirected graphs where each node represents a person and each edge represents a friendship. Hence we implemented two classes in graph.py, which is an implementation of an adjacency list, which is a node-centric view of the graph. The first class (“person”)  held information about a  a person and their friends, their purchase history,  as well as some accessory functions for working with a person.  The second class (social_network) holds information about the social network as a whole. This information includes the people in the network as well as parameters D and T. 
 
 
