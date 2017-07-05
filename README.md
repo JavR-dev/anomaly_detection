@@ -1,5 +1,5 @@
 # Table of Contents
-1. [Challenge Summary](README.md#challenge-summary)
+1. [Solution Summary](README.md#challenge-summary)
 2. [Details of Implementation](README.md#details-of-implementation)
 3. [Anomalous Purchases](README.md#anomalous-purchases)
 4. [Sample Data](README.md#sample-data)
@@ -11,10 +11,13 @@
 
 
 # Challenge Summary
+To solve the problem, the
+Social network construction: 
+A social network is a simple undirected graphs where each node represents a person and each edge represents a friendship. Hence we implemented two classes in graph.py, which is an implementation of an adjacency list, which is a node-centric view of the graph. The first class (“person”)  held information about a  a person and their friends, their purchase history,  as well as some accessory functions for working with a person.  The second class (social_network) holds information about the social network as a whole. This information includes the people in the network as well as parameters D and T. 
 
-Imagine you're at an e-commerce company, Market-ter, that also has a social network. In addition to shopping, users can see which items their friends are buying, and are influenced by the purchases within their network. 
 
-Your challenge is to build a real-time platform to analyze purchases within a social network of users, and detect any behavior that is far from the average within that social network.
+
+
 
 ### Example
 
