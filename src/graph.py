@@ -3,7 +3,7 @@ import math;
 import time;
 import datetime;
 
-### defines node object ###########################################################################
+### defines person object ###########################################################################
 class person:
     #def __init__(self, name = '', friends = set(), purchases = [], total = 0, network = [] ):
     def __init__(self, name = None, friends = None, purchases = None, total = None, network = None ):
