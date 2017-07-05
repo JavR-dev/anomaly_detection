@@ -3,9 +3,23 @@ import math;
 import time;
 import datetime;
 
-### defines person object ###########################################################################
+###############################################################################################
+# class person
+############################################################################################### 
+# summary: instantiates a person
+###############################################################################################
 class person:
-    #def __init__(self, name = '', friends = set(), purchases = [], total = 0, network = [] ):
+    ###############################################################################################
+    # __init__
+    ############################################################################################### 
+    # summary: initialize a person
+    # input:  
+    #        name: numeric id of person
+    #        friends: names of friend
+    #        purchases: purchases made by this person
+    #        total: holds total sum of all purchases (feature not implemented)
+    #        local_network: the local network of the person (defined by D)
+    ###############################################################################################
     def __init__(self, name = None, friends = None, purchases = None, total = None, network = None ):
       self.name = name;
       self.friends = friends;     # unique set of tupples, with lower id set first. 
@@ -14,12 +28,33 @@ class person:
       self.local_network = None         # social network based on D
       self.anomalous = False
 
+    ###############################################################################################
+    # add_friend
+    ############################################################################################### 
+    # summary: adds a friendship
+    # input:  None
+    # output: adds a friendship
+    ###############################################################################################
     def add_friend(self, friendship = None):
      self.friends.add( friendship )
 
+    ###############################################################################################
+    # remove_friend
+    ############################################################################################### 
+    # summary: remove_friend ends a friendship
+    # input:  None
+    # output: removes a friendship
+    ###############################################################################################
     def remove_friend(self, friendship = None):
      self.friends.discard( friendship )
 
+    ###############################################################################################
+    # get_friends
+    ############################################################################################### 
+    # summary: get_friends
+    # input:  None
+    # output: returns friends
+    ###############################################################################################
     def get_friends(self):
      return self.friends
 
@@ -88,19 +123,64 @@ class person:
      #self.calculate_mean_sd()
      # No need to calculate mean and sd yet as anomalous detection starts from the second input file. 
 
+###############################################################################################
+# class social_network
+############################################################################################### 
+# summary: holds the entire social network as a graph data structure (adjacency list)
+###############################################################################################
 class social_network:
+ 
+    ###############################################################################################
+    # __init__
+    ############################################################################################### 
+    # summary: initialize a social network
+    # input:  
+    #        D: degrees of removal to consider
+    #        T: Number of purchases in local network to consider
+    ###############################################################################################
     def __init__(self, persons={}, D = None, T = None):
      self.persons = persons
      self.D = D
      self.T = T
     
-    # object functions
+    ###############################################################################################
+    # person_exists
+    ############################################################################################### 
+    # summary: check if a person exists
+    # input:  
+    #        id: the id of a person
+    # output:
+    #        returns True if the person exists in the network
+    ###############################################################################################
     def person_exists(self, id = None):
      return int(id) in self.persons;
 
+
+    ###############################################################################################
+    # add_person
+    ############################################################################################### 
+    # summary: add a person if not present
+    # input:  
+    #        name: the numeric id of the person
+    #        friends: friends of person
+    #        purchases: purchases made by person
+    #        total: the running total of purchases
+    # output:
+    #        None
+    ###############################################################################################
     def add_person( self, name = None, friends = None, purchases = None, total = None ):
          self.persons[int(name)] = person( name = int(name), friends = friends , purchases = purchases, total = total, network = None ); # may need to interpret time stamp later
 
+    ###############################################################################################
+    # befriend
+    ############################################################################################### 
+    # summary: make two persons friends
+    # input:  
+    #        name1: first person
+    #        name2: second person
+    # output:
+    #        None
+    ###############################################################################################
     def befriend( self, name1 = None, name2 = None ):
      name1 = int(name1)
      name2 = int(name2)
@@ -108,7 +188,16 @@ class social_network:
      self.persons[ name1 ].add_friend( friendship = name2 ) 
      self.persons[ name2 ].add_friend( friendship = name1 ) 
      
-
+    ###############################################################################################
+    # befriend
+    ############################################################################################### 
+    # summary: end a friendship between two persons 
+    # input:  
+    #        name1: first person
+    #        name2: second person
+    # output:
+    #        None
+    ###############################################################################################
     def unfriend( self, name1 = None, name2 = None ):
      name1 = int( name1 )
      name2 = int( name2 )
@@ -116,20 +205,55 @@ class social_network:
      self.persons[ name1 ].remove_friend( friendship = name2 ) 
      self.persons[ name2 ].remove_friend( friendship = name1 ) 
 
+    ###############################################################################################
+    # process_purchase
+    ############################################################################################### 
+    # summary: process a purchase
+    # input:  
+    #        name: person who made the purchase
+    #        amount: monatary amount
+    #        timestamp: the timestamp
+    # output:
+    #        None
+    ###############################################################################################
     def process_purchase( self, name = None, amount = None, timestamp = None ):
      self.persons[ name ].make_purchase( amount = amount, timestamp = timestamp )
      #print('++++++++++++++++++++++++++++++++++++++++++++++++')
      #print('add anomalous purchase handling in this function')
      #print('++++++++++++++++++++++++++++++++++++++++++++++++')
 
+
+
+    ###############################################################################################
+    # process_purchase
+    ############################################################################################### 
+    # summary: makes a timestamp tuple which keeps track of te timestamp, whether it was in the
+    #          stream and which row it occured in.
+    # input:  
+    #        timestamp: the timestamp
+    #        stream: boolean denoting stream file (assumed to come later)
+    #        row: the row in the file of origin (to break ties)
+    # output:
+    #        the timestamp tuple
+    ###############################################################################################
     def process_timestamp( self, timestamp = None, stream = None, row = None ):
      #timestamp = time.mktime( datetime.datetime.strptime( timestamp, "%Y-%m-%d %H:%M:%S" ).timetuple() )
      timestamp = (stream, timestamp,row )
      return timestamp
 
 
-    # parse the batch input if stream is false
-    # parse stream if stream is True
+    ###############################################################################################
+    # parse_network
+    ############################################################################################### 
+    # summary: creates a social network out of either input file
+    #          
+    # input:  
+    #        timestamp: input data as supplied by either log file
+    #        stream: which output file was used ( True if stream)
+    #        outfile: Keep track of the outfile in case we have to write.
+    # output:
+    #        the social network object. 
+    ###############################################################################################
     def parse_network( self, input_data = None, stream = False, outfile = None ):
      row = 0
      for event in input_data:
@@ -223,7 +347,22 @@ class social_network:
        self.init_local_network( person = cur_person, purchase = False, amount = None, stream = False, outfile = False);
 
 
-    # initializes the social network for an individual. 
+    
+    ###############################################################################################
+    # parse_network
+    ############################################################################################### 
+    # summary:  initializes the social network for a specific person. 
+    #          
+    # input:  
+    #        people: unique set of people in network
+    #        purchase: is this a purchase?
+    #        amount: the amount of the purchase
+    #        stream: which file was this made in (must be stream for anomaly)
+    #        event: the event which triggered the function to be called (will need to write output)
+    #        outfile: the outfile to write to if an anomaly is detected. 
+    # output:
+    #        None
+    ###############################################################################################
     def init_local_network( self, person = None, purchase = False, amount = None, stream = False, event = None,  outfile = None ):
      # people should be unique but timestamp[i] should correspond to  purchase [i];
      friend_network = { 'people': set(), 'timestamps': [], 'amounts': [] } 
@@ -235,8 +374,23 @@ class social_network:
     
 
      
-    # comparing timestamps was time consuming. Put time consuming step inside, where fewer operations would be needed.
-    # no need to convert every single timestamp... just the ones where purchases are made.
+    ###############################################################################################
+    # purchase_is_anomalous
+    ############################################################################################### 
+    # summary: check if the purchase is anomalous. 
+    #          Note: comparing timestamps was time expensive. Faewer operations would be needed
+    #                if delayed till an anomaly needed to be detected. 
+    #                no need to convert every single timestamp... just the ones where purchases are made.
+    # input:  
+    #        people: unique set of people in network
+    #        purchase: is this a purchase?
+    #        amount: the amount of the purchase
+    #        stream: which file was this made in (must be stream for anomaly)
+    #        event: the event which triggered the function to be called (will need to write output)
+    #        outfile: the outfile to write to if an anomaly is detected. 
+    # output:
+    #        None
+    ###############################################################################################
     def purchase_is_anomalous( self, person = None, friend_network = None, current_purchase = None, event = None,  outfile = None):
      # first we must pick events 
      timestamps_info = friend_network['timestamps']
@@ -265,7 +419,19 @@ class social_network:
       person.is_anomalous( person = person, amounts = relevant_amounts, purchase = current_purchase, event = event,  outfile = outfile );
       
           
-    #recursive function for local network traversal 
+    ###############################################################################################
+    # get_friend_network
+    ############################################################################################### 
+    # summary: 
+    #          recursive function fora local network traversal and creation 
+    # input:  
+    #        D: levels of frienship to explore (1) only my friends (2) friends of friends ...
+    #        person: the person we will start with 
+    #        network: the whole social network
+    #        top of recursion: is this the starting person?
+    # output:
+    #        the social network as a dictionary
+    ###############################################################################################
     def get_friend_network( self,  D = None , person = None, network = None, top_of_recursion = None ):
      # no need to further recurse
      # redundantly added in case of edge-case
