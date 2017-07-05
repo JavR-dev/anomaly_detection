@@ -9,15 +9,16 @@ def read_file(data_file):
  read_file = None;
  try:
     read_file = json.load( data_file , parse_float = True );
-    return( read_file )
+    if type(read_file) == type(dict()):
+      read_file = [read_file]
  except ValueError:
     print('fixing batch logfile was not a proper json file');
     data_file.seek(0)
     lines = data_file.readlines();
-    read_file= [];
-    for i in range( 0, len(lines)-1):
-     read_file.append(json.loads(lines[i]));
-    return( read_file );
+    read_file = [];
+    for i in range( 0, len(lines)-1 ):
+     read_file.append( json.loads(lines[i], parse_float = True ) );
+ return( read_file );
 
 
 
@@ -31,7 +32,7 @@ batch_log = read_file( data_file );
 input_params = batch_log[ 0 ]
 batch_input = batch_log[ 1: ]
 
-data_file = open( sys.argv[2] );
+data_file = open( sys.argv[2], 'r' );
 stream_data = read_file( data_file )
 ####################################################################################################
 

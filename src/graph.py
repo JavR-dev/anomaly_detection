@@ -20,25 +20,48 @@ class person:
     def remove_friend(self, friendship = None):
      self.friends.discard( friendship )
 
-    def has_friend(self, edge = None):
-       pdb.set_trace()
-
     def get_friends(self):
      return self.friends
 
+    ###############################################################################################
+    # make_purchase
+    ############################################################################################### 
+    # summary: updates purchases made by person
+    # input: 
+    #   amount: the amount of the purchase
+    #   timestamp: the associated timestamp
+    # output: None
+    ###############################################################################################
     def make_purchase(self, amount = 0, timestamp = None ):
      self.purchases.append( { 'timestamp': timestamp, 'amount': amount }  );
     
+    ###############################################################################################
+    # calculate_mean_sd
+    ############################################################################################### 
+    # summary: calculates mean and standard deviation given a list of amounts
+    # input: a list of amounts
+    # output: a dictionary containing the mean and standard deviation
+    ###############################################################################################
     def calculate_mean_sd( self, amounts = None ):
      mean = sum( amounts )/len( amounts )
      sd = 0;
-     for i in range(1,len(amounts)):
-       sd += math.pow(amounts[i] - mean,2);
-     sd = sd/len(amounts)
+     for i in range(0,len(amounts)):
+       sd = sd + math.pow(amounts[i] - mean,2);
+     sd = sd/(len(amounts))
      sd = math.sqrt( sd ); 
      return( {'mean': mean,'sd': sd})
 
-
+    ###############################################################################################
+    # is_anomalous
+    ############################################################################################### 
+    # summary: identifies anomalous purchase  and writes it to output files
+    # input: 
+    #       amounts: a list of purchases made in the persons social network
+    #       purchase: the purchase being evaluated
+    #       event: the event associated with the purchase
+    #       outfile: the outfile to write to if the purchase is anomalous
+    # output: NONE, outputs anomalous data to file if needed
+    ###############################################################################################
     def is_anomalous( self, person = None, amounts = None, purchase = None, event = None, outfile = None ):
       mean_sd = self.calculate_mean_sd(amounts)
       mean = mean_sd['mean']
@@ -49,10 +72,9 @@ class person:
       if not self.anomalous: 
        self.anomalous =  purchase > upper_bound
        if(self.anomalous):
-        print('ANOMALY!!!')
         event['mean'] = "%.2f"%(mean)
         event['sd'] = "%.2f"%(sd)
-        output_string = '"event_type":"%s", "timestamp":"%s", "id": "%s", "amount": "%s", "mean": "%s", "sd": "%s"\n'%( event['event_type'], event['timestamp'], event['id'], event['amount'], event['mean'], event['sd'] )
+        output_string = '{"event_type":"%s", "timestamp":"%s", "id": "%s", "amount": "%s", "mean": "%s", "sd": "%s"}\n'%( event['event_type'], event['timestamp'], event['id'], event['amount'], event['mean'], event['sd'] )
         outfile.write(output_string)
         outfile.flush()
 
@@ -244,7 +266,7 @@ class social_network:
       
           
     #recursive function for local network traversal 
-    def get_friend_network(self,  D = None , person = None, network = None, top_of_recursion = None ):
+    def get_friend_network( self,  D = None , person = None, network = None, top_of_recursion = None ):
      # no need to further recurse
      # redundantly added in case of edge-case
      if(D < 0):
